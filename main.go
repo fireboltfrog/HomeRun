@@ -5,38 +5,20 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"time"
 
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
 	"gopkg.in/yaml.v2"
 )
 
-type device struct {
-	Name   string `yaml:"name"`
-	Remote int    `yaml:"remote"`
-}
-
 type homekit struct {
 	Pin string `yaml:"pin"`
 }
 
-type remote struct {
-	Sleep  uint
-	Margin uint
-	Count  uint
-}
-
 type config struct {
-	Devices []device `yaml:"devices"`
-	HomeKit homekit  `yaml:"homekit"`
-	Remote  remote   `yaml:"remote"`
-}
-
-type command struct {
-	DeviceID uint64
-	Current  int
-	Target   int
+	Devices     []device      `yaml:"devices"`
+	Controllers []controllers `yaml:"controllers"`
+	HomeKit     homekit       `yaml:"homekit"`
 }
 
 func main() {
@@ -51,33 +33,16 @@ func main() {
 
 	c := config{}
 	yaml.Unmarshal(data, &c)
-
 	accs := []*accessory.Accessory{}
-	// each remote has a go routine that handles the commands
-	// which are passed trough the remotes channel
-	for i := 0; i < c.Remote.Count; i++ {
-		rchan := make(chan command)
-		// add devices assinged to this remote
-		for _, d := range c.Devices {
-			if d.Remote == i {
-				fmt.Printf("adding %s\n", d.Name)
-				info := accessory.Info{
-					Name: d.Name,
-				}
-				ac := NewWindowCovering(info)
-				accs = append(accs, ac.Accessory)
-				// periodically check for updates
-				go func() {
-					for {
-						time.Sleep(time.Second)
-						ac.Update(rchan)
-					}
-				}()
-			}
+	rdvs := make([][]*WindowCovering, len(c.Controllers))
+	for _, d := range c.Devices {
+		fmt.Printf("adding %s\n", d.Name)
+		info := accessory.Info{
+			Name: d.Name,
 		}
-		go func() {
-			NewRemote(rchan)
-		}()
+		ac := NewWindowCovering(info, d)
+		accs = append(accs, ac.Accessory)
+		rdvs[d.Controller] = append(rdvs[d.Controller], ac)
 	}
 
 	conf := hc.Config{Pin: c.HomeKit.Pin}
@@ -88,6 +53,10 @@ func main() {
 	hc.OnTermination(func() {
 		<-t.Stop()
 	})
+
+	for _, ds := range rdvs {
+		go c.Controllers[0].monitor(ds)
+	}
 
 	t.Start()
 }

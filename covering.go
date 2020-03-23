@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/brutella/hc/accessory"
 	"github.com/brutella/hc/service"
 )
@@ -10,27 +8,37 @@ import (
 type WindowCovering struct {
 	*accessory.Accessory
 	WindowCovering *service.WindowCovering
+	Device         device
 }
 
-func NewWindowCovering(info accessory.Info) *WindowCovering {
+type device struct {
+	Name       string `yaml:"name"`
+	Controller uint   `yaml:"controller"`
+	Position   uint   `yaml:"position"`
+}
+
+func NewWindowCovering(info accessory.Info, d device) *WindowCovering {
 	acc := WindowCovering{}
 	acc.Accessory = accessory.New(info, accessory.TypeWindowCovering)
 	acc.WindowCovering = service.NewWindowCovering()
 	acc.AddService(acc.WindowCovering.Service)
+	acc.Device = d
 	return &acc
 }
 
-// Update will update the position if the current position does not match the target position
-func (a *WindowCovering) Update(ch chan<- command) {
-	c := a.WindowCovering.CurrentPosition.GetValue()
-	t := a.WindowCovering.TargetPosition.GetValue()
-	if t != c {
-		fmt.Printf("update current position: %v -> %v\n", c, t)
-		ch <- command{
-			DeviceID: a.ID,
-			Current:  c,
-			Target:   t,
-		}
-		a.WindowCovering.CurrentPosition.SetValue(t)
-	}
+func (a *WindowCovering) current() int {
+	return a.WindowCovering.CurrentPosition.GetValue()
+}
+
+func (a *WindowCovering) target() int {
+	return a.WindowCovering.TargetPosition.GetValue()
+}
+
+func (a *WindowCovering) changed() bool {
+	return a.current() != a.target()
+}
+
+func (a *WindowCovering) update() {
+	t := a.target()
+	a.WindowCovering.CurrentPosition.SetValue(t)
 }

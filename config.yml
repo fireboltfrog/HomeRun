@@ -1,13 +1,26 @@
 homekit:
   pin: 58331770
-remote:
-  sleep: 125
-  margin: 10
-  count: 2
+controllers:
+  - period: 115
+    margin: 10
+    min: 1
+    max: 6
+    next: 2
+    down: 3
+    hold: 4
+    up: 17
+  - period: 115
+    margin: 10
+    min: 1
+    max: 6
+    next: 27
+    down: 22
+    hold: 10
+    up: 11
 devices:
   - name: Living Room Door
-    remote: 2
-    remote_id: 1
+    controller: 1
+    position: 1
   - name: Living Room Window
-    remote: 1
-    remote_id: 2
+    controller: 0
+    position: 2
