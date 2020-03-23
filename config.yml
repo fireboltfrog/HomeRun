@@ -18,9 +18,9 @@ controllers:
     hold: 10
     up: 11
 devices:
-  - name: Living Room Door
+  - name: Device_1
+    controller: 0
+    position: 1
+  - name: Device_2
     controller: 1
     position: 1
-  - name: Living Room Window
-    controller: 0
-    position: 2
