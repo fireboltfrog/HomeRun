@@ -1,0 +1,13 @@
+homekit:
+  pin: 58331770
+remote:
+  sleep: 125
+  margin: 10
+  count: 2
+devices:
+  - name: Living Room Door
+    remote: 2
+    remote_id: 1
+  - name: Living Room Window
+    remote: 1
+    remote_id: 2
