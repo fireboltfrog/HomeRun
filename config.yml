@@ -18,9 +18,21 @@ controllers:
     hold: 10
     up: 11
 devices:
-  - name: Device_1
+  - name: UG_RAUM_0
     controller: 0
     position: 1
-  - name: Device_2
+  - name: EG_BIB
+    controller: 0
+    position: 2
+  - name: EG_TUERE
+    controller: 0
+    position: 3
+  - name: EG_WOHNZIMMER
+    controller: 0
+    position: 4
+  - name: OG_RAUM_0
+    controller: 0
+    position 5
+  - name: EG_ESSZIMMER
     controller: 1
     position: 1

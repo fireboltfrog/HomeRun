@@ -20,9 +20,9 @@ type controllers struct {
 }
 
 func toggle(pin rpio.Pin) {
-	pin.High()
-	time.Sleep(500 * time.Millisecond)
 	pin.Low()
+	time.Sleep(500 * time.Millisecond)
+	pin.High()
 	time.Sleep(500 * time.Millisecond)
 }
 
@@ -36,7 +36,7 @@ func (c *controllers) monitor(devs []*WindowCovering) {
 	up := rpio.Pin(c.Up)
 	for _, p := range []rpio.Pin{next, down, hold, up} {
 		p.Output()
-		p.Low()
+		p.High()
 	}
 	last := time.Now()
 	period := time.Second * time.Duration(c.Period)
