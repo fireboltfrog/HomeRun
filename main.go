@@ -44,9 +44,9 @@ func main() {
 		accs = append(accs, ac.Accessory)
 		rdvs[d.Controller] = append(rdvs[d.Controller], ac)
 	}
-
 	conf := hc.Config{Pin: c.HomeKit.Pin}
-	t, err := hc.NewIPTransport(conf, accs[0], accs[1:]...)
+	bridge := accessory.NewBridge(accessory.Info{Name: "HomeRun"})
+	t, err := hc.NewIPTransport(conf, bridge.Accessory, accs...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,6 +57,6 @@ func main() {
 	for _, ds := range rdvs {
 		go c.Controllers[0].monitor(ds)
 	}
-
+	fmt.Printf("HomeKit PIN: %v\n",c.HomeKit.Pin)
 	t.Start()
 }

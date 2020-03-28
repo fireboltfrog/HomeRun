@@ -21,9 +21,9 @@ type controllers struct {
 
 func toggle(pin rpio.Pin) {
 	pin.Low()
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(200 * time.Millisecond)
 	pin.High()
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(300 * time.Millisecond)
 }
 
 func (c *controllers) monitor(devs []*WindowCovering) {
