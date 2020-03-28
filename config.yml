@@ -32,7 +32,7 @@ devices:
     position: 4
   - name: OG_RAUM_0
     controller: 0
-    position 5
+    position: 5
   - name: EG_ESSZIMMER
     controller: 1
     position: 1
