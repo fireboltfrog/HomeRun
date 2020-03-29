@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/stianeikeland/go-rpio"
@@ -27,7 +28,7 @@ func toggle(pin rpio.Pin) {
 	time.Sleep(300 * time.Millisecond)
 }
 
-func (c *controllers) monitor(devs []*WindowCovering) {
+func (c *controllers) monitor(lock *sync.Mutex, devs []*WindowCovering) {
 	if err := rpio.Open(); err != nil {
 		log.Fatal("coult not find GPIO pins: ", err)
 	}
@@ -75,25 +76,29 @@ func (c *controllers) monitor(devs []*WindowCovering) {
 				c := d.current()
 				fmt.Printf("target: %v\n", t)
 				d.update()
+				lock.Lock()
 				switch t {
-					case 0:
+				case 0:
+					toggle(down)
+				case 100:
+					toggle(up)
+				default:
+					diff := t - c
+					if diff < 0 {
 						toggle(down)
-					case 100:
+						diff = -diff
+					} else {
 						toggle(up)
-					default:
-						diff := t - c
-						if diff < 0 {
-							toggle(down)
-							diff = -diff
-						} else {
-							toggle(up)
-						}
-						duration := d.Device.Time / 100 * diff
-						time.Sleep(time.Millisecond * time.Duration(duration))
-						toggle(hold)
+					}
+					duration := d.Device.Time / 100 * diff
+					time.Sleep(time.Millisecond * time.Duration(duration))
+					toggle(hold)
 
 				}
 				last = time.Now()
+				// prevent interfearance between commands
+				time.Sleep(time.Millisecond * 250)
+				lock.Unlock()
 			}
 		}
 		time.Sleep(time.Second)

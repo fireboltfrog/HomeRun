@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"sync"
 
 	"github.com/brutella/hc"
 	"github.com/brutella/hc/accessory"
@@ -53,10 +54,10 @@ func main() {
 	hc.OnTermination(func() {
 		<-t.Stop()
 	})
-
+	var mutex = &sync.Mutex{}
 	for i, ds := range rdvs {
-		go c.Controllers[i].monitor(ds)
+		go c.Controllers[i].monitor(mutex, ds)
 	}
-	fmt.Printf("HomeKit PIN: %v\n",c.HomeKit.Pin)
+	fmt.Printf("HomeKit PIN: %v\n", c.HomeKit.Pin)
 	t.Start()
 }
