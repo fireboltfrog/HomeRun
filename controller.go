@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"sort"
 	"time"
 
 	"github.com/stianeikeland/go-rpio"
@@ -13,7 +14,7 @@ type controllers struct {
 	Margin uint `yaml:"margin"`
 	Min    uint `yaml:"min"`
 	Max    uint `yaml:"max"`
-	Next   uint `yaml:"next"`
+	Nav    uint `yaml:"nav"`
 	Down   uint `yaml:"down"`
 	Hold   uint `yaml:"hold"`
 	Up     uint `yaml:"up"`
@@ -30,11 +31,11 @@ func (c *controllers) monitor(devs []*WindowCovering) {
 	if err := rpio.Open(); err != nil {
 		log.Fatal("coult not find GPIO pins: ", err)
 	}
-	next := rpio.Pin(c.Next)
+	back := rpio.Pin(c.Nav)
 	down := rpio.Pin(c.Down)
 	hold := rpio.Pin(c.Hold)
 	up := rpio.Pin(c.Up)
-	for _, p := range []rpio.Pin{next, down, hold, up} {
+	for _, p := range []rpio.Pin{back, down, hold, up} {
 		p.Output()
 		p.High()
 	}
@@ -44,10 +45,16 @@ func (c *controllers) monitor(devs []*WindowCovering) {
 	fmt.Println("wait one period")
 	time.Sleep(period)
 	fmt.Println("ready")
+	// we want to iterate backwards, as we also navigate backwards on the remote
+	// this reduces the amounts of shifts
+	sort.Slice(devs, func(i, j int) bool {
+		return devs[i].Device.Position > devs[j].Device.Position
+	})
 	var active uint = 0
 	for {
 		for _, d := range devs {
 			if d.changed() {
+				fmt.Printf("TRIGGERED: %v\n", d.Device.Position)
 				// wake up controller if necessary
 				if dur := time.Now().Sub(last); dur > period {
 					if wait := period + margin - dur; 0 < wait {
@@ -59,8 +66,8 @@ func (c *controllers) monitor(devs []*WindowCovering) {
 					time.Sleep(time.Second)
 				}
 				for active+1 != d.Device.Position {
-					toggle(next)
-					active++
+					toggle(back)
+					active += c.Max - 1
 					active = active % c.Max
 					fmt.Printf("shifted to %v\n", active+1)
 				}

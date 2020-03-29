@@ -54,8 +54,8 @@ func main() {
 		<-t.Stop()
 	})
 
-	for _, ds := range rdvs {
-		go c.Controllers[0].monitor(ds)
+	for i, ds := range rdvs {
+		go c.Controllers[i].monitor(ds)
 	}
 	fmt.Printf("HomeKit PIN: %v\n",c.HomeKit.Pin)
 	t.Start()

@@ -1,0 +1,53 @@
+homekit:
+    pin: 11111111
+controllers:
+  - period: 115
+    margin: 10
+    min: 1
+    max: 6
+    nav: 2
+    down: 3
+    hold: 4
+    up: 17
+  - period: 115
+    margin: 10
+    min: 1
+    max: 6
+    nav: 27
+    down: 9
+    hold: 10
+    up: 22
+devices:
+  - name: DEV_0_1
+    controller: 0
+    position: 1
+  - name: DEV_0_2
+    controller: 0
+    position: 2
+  - name: DEV_0_3
+    controller: 0
+    position: 3
+  - name: DEV_0_4
+    controller: 0
+    position: 4
+  - name: DEV_0_5
+    controller: 0
+    position: 5
+  - name: DEV_1_1
+    controller: 1
+    position: 1
+  - name: DEV_1_2
+    controller: 1
+    position: 2
+  - name: DEV_1_3
+    controller: 1
+    position: 3
+  - name: DEV_1_4
+    controller: 1
+    position: 4
+  - name: DEV_1_5
+    controller: 1
+    position: 5
+  - name: DEV_1_6
+    controller: 1
+    position: 6
