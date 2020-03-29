@@ -71,15 +71,26 @@ func (c *controllers) monitor(devs []*WindowCovering) {
 					active = active % c.Max
 					fmt.Printf("shifted to %v\n", active+1)
 				}
-				c := d.current()
 				t := d.target()
+				c := d.current()
 				fmt.Printf("target: %v\n", t)
-				if t < c {
-					toggle(down)
-					fmt.Println("down")
-				} else {
-					toggle(up)
-					fmt.Println("up")
+				switch t {
+					case 0:
+						toggle(down)
+					case 100:
+						toggle(up)
+					default:
+						diff := t - c
+						if diff < 0 {
+							toggle(down)
+							diff = -diff
+						} else {
+							toggle(up)
+						}
+						duration := d.Device.Time / 100 * diff
+						time.Sleep(time.Millisecond * time.Duration(duration))
+						toggle(hold)
+
 				}
 				last = time.Now()
 				d.update()

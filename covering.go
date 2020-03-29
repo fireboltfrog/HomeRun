@@ -15,6 +15,7 @@ type device struct {
 	Name       string `yaml:"name"`
 	Controller uint   `yaml:"controller"`
 	Position   uint   `yaml:"position"`
+	Time       int   `yaml:"time"`
 }
 
 func NewWindowCovering(info accessory.Info, d device) *WindowCovering {
