@@ -74,6 +74,7 @@ func (c *controllers) monitor(devs []*WindowCovering) {
 				t := d.target()
 				c := d.current()
 				fmt.Printf("target: %v\n", t)
+				d.update()
 				switch t {
 					case 0:
 						toggle(down)
@@ -93,7 +94,6 @@ func (c *controllers) monitor(devs []*WindowCovering) {
 
 				}
 				last = time.Now()
-				d.update()
 			}
 		}
 		time.Sleep(time.Second)
